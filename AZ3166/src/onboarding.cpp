@@ -161,7 +161,7 @@ void OnboardingController::processResultRequest(WiFiClient &client, String &requ
     char buff[dataLength] = {0};
     data.toCharArray(buff, dataLength);
     char *pch = strtok(buff, "&");
-    AutoString ssid, password, connStr;
+    AutoString ssid, password, auth, scopeId, regId, sasKey;
     uint8_t checkboxState = 0x00; // bit order - see globals.h
 
     while (pch != NULL)
@@ -199,8 +199,8 @@ void OnboardingController::processResultRequest(WiFiClient &client, String &requ
                     urldecode(value, valueLength, &ssid);
                 } else if (strncmp(key, "PASS", 4) == 0) {
                     urldecode(value, valueLength, &password);
-                } else if (strncmp(key, "CONN", 4) == 0) {
-                    urldecode(value, valueLength, &connStr);
+                } else if (strncmp(key, "AUTH", 4) == 0) {
+                    urldecode(value, valueLength, &auth);
                 } else if (strncmp(key, "TEMP", 4) == 0) {
                     checkboxState = checkboxState | TEMP_CHECKED;
                 } else if (strncmp(key, "PRES", 4) == 0) {
@@ -222,6 +222,8 @@ void OnboardingController::processResultRequest(WiFiClient &client, String &requ
                     } else {
                         pincodePasses = true;
                     }
+                } else if (strncmp(key, "REGID", 5) == 0) {
+                    urldecode(value, valueLength, &regId);
                 } else {
                     unknown = true;
                 }
@@ -229,7 +231,13 @@ void OnboardingController::processResultRequest(WiFiClient &client, String &requ
             break;
 
             default:
-                unknown = true;
+                if (idx == 6 && strncmp(key, "SASKEY", 6) == 0) {
+                    urldecode(value, valueLength, &sasKey);
+                } else if (idx == 7 && strncmp(key, "SCOPEID", 7) == 0) {
+                    urldecode(value, valueLength, &scopeId);
+                } else {
+                    unknown = true;
+                }
         }
 
         LOG_VERBOSE("Checkbox State %d", checkboxState);
@@ -244,7 +252,7 @@ void OnboardingController::processResultRequest(WiFiClient &client, String &requ
         pch = strtok(NULL, "&");
     }
 
-    if (ssid.getLength() == 0 || connStr.getLength() == 0) {
+    if (ssid.getLength() == 0 || sasKey.getLength() == 0) {
         LOG_ERROR("Missing ssid or connStr. Responsed with START page");
         processStartRequest(client);
         return;
@@ -257,8 +265,8 @@ void OnboardingController::processResultRequest(WiFiClient &client, String &requ
     assert(ssid.getLength() != 0);
     ConfigController::storeWiFi(ssid, password);
 
-    assert(connStr.getLength() != 0);
-    ConfigController::storeConnectionString(connStr);
+    assert(auth.getLength() != 0);
+    ConfigController::storeKey(auth, scopeId, regId, sasKey);
 
     AutoString configData(3);
     snprintf(*configData, 3, "%d", checkboxState);
