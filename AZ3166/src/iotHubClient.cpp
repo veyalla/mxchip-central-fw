@@ -29,29 +29,28 @@ void IoTHubClient::initIotHubClient() {
     char scopeId[STRING_BUFFER_128] = {0};
     char registrationId[STRING_BUFFER_128] = {0};
     bool sasKey = false;
-    if (ConfigController::readGroupSXKeyAndDeviceId(scopeId, registrationId, stringBuffer, sasKey)) { // GroupSAS?
-        DevkitDPSSetLogTrace(SERIAL_VERBOSE_LOGGING_ENABLED);
-        if (!DevkitDPSClientStart(sasKey ? DPS_AUTH_SYMMETRIC_KEY : DPS_AUTH_X509_GROUP,
-                            "global.azure-devices-provisioning.net",
-                            scopeId, registrationId, stringBuffer, NULL, 0)) {
-            LOG_ERROR("ERROR: DPS client for GroupSAS has failed.");
-            hasError = true;
-            return;
-        } else {
-            char newConnectionString[AZ_IOT_HUB_MAX_LEN] = {0};
-            size_t pos = snprintf(newConnectionString, AZ_IOT_HUB_MAX_LEN,
-                "HostName=%s;DeviceId=%s;SharedAccessKey=%s",
-                DevkitDPSGetIoTHubURI(),
-                DevkitDPSGetDeviceID(),
-                stringBuffer);
-            assert(pos < AZ_IOT_HUB_MAX_LEN);
-            WatchdogController::reset();
-            strncpy(stringBuffer, newConnectionString, pos);
-            stringBuffer[pos] = char(0);
-        }
+    ConfigController::readGroupSXKeyAndDeviceId(scopeId, registrationId, stringBuffer, sasKey);
+    DevkitDPSSetLogTrace(SERIAL_VERBOSE_LOGGING_ENABLED);
+    if (!DevkitDPSClientStart(sasKey ? DPS_AUTH_SYMMETRIC_KEY : DPS_AUTH_X509_GROUP,
+                        "global.azure-devices-provisioning.net",
+                        scopeId, registrationId, stringBuffer, NULL, 0)) {
+        LOG_ERROR("ERROR: DPS client for GroupSAS has failed.");
+        hasError = true;
+        return;
     } else {
-        ConfigController::readConnectionString(stringBuffer, AZ_IOT_HUB_MAX_LEN);
+        char newConnectionString[AZ_IOT_HUB_MAX_LEN] = {0};
+        size_t pos = snprintf(newConnectionString, AZ_IOT_HUB_MAX_LEN,
+            "HostName=%s;DeviceId=%s;SharedAccessKey=%s",
+            DevkitDPSGetIoTHubURI(),
+            DevkitDPSGetDeviceID(),
+            stringBuffer);
+        assert(pos < AZ_IOT_HUB_MAX_LEN);
+        WatchdogController::reset();
+        strncpy(stringBuffer, newConnectionString, pos);
+        stringBuffer[pos] = char(0);
     }
+    // Previously;
+    // ConfigController::readConnectionString(stringBuffer, AZ_IOT_HUB_MAX_LEN);
 
     String connString(stringBuffer);
     String deviceIdString = connString.substring(connString.indexOf("DeviceId=")

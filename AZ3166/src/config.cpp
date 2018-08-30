@@ -83,7 +83,7 @@ void ConfigController::storeKey(AutoString &auth, AutoString &scopeId, AutoStrin
     eeprom.write((uint8_t*) buffer, AZ_IOT_HUB_MAX_LEN, AZ_IOT_HUB_ZONE_IDX);
 }
 
-bool ConfigController::readGroupSXKeyAndDeviceId(char * scopeId, char * registrationId, char * sas, bool &sasKey) {
+void ConfigController::readGroupSXKeyAndDeviceId(char * scopeId, char * registrationId, char * sas, bool &sasKey) {
 #if !defined(IOT_CENTRAL_SAS_KEY)
     char buffer[AZ_IOT_HUB_MAX_LEN];
     EEPROMInterface eeprom;
@@ -98,12 +98,8 @@ bool ConfigController::readGroupSXKeyAndDeviceId(char * scopeId, char * registra
     strcpy(sas, IOT_CENTRAL_SAS_KEY);
     strcpy(registrationId, IOT_CENTRAL_SAS_REGISTRATION_ID);
     strcpy(scopeId, IOT_CENTRAL_SAS_SCOPE_ID);
+    sasKey = true;
 #endif // !defined(IOT_CENTRAL_SAS_KEY)
-    size_t len = strlen(sas);
-    if (len == 0) return false;
-    if (sas[len-1] != '=') return false;
-
-    return true;
 }
 
 void ConfigController::readIotCentralConfig(char* iotCentralConfig, uint32_t buffer_size) {

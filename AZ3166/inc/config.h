@@ -20,7 +20,7 @@ public:
     static void readWiFi(char* ssid, int ssidLen, char *password, int passwordLen);
     static void readConnectionString(char * connectionString, uint32_t buffer_size);
     static void readIotCentralConfig(char * iotCentralConfig, uint32_t buffer_size);
-    static bool readGroupSXKeyAndDeviceId(char * scopeId, char * registrationId, char * sas, bool &sasKey);
+    static void readGroupSXKeyAndDeviceId(char * scopeId, char * registrationId, char * sas, bool &sasKey);
 
     static void clearWiFiEEPROM();
     static void clearAzureEEPROM();
