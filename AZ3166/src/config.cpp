@@ -89,7 +89,7 @@ void ConfigController::readGroupSXKeyAndDeviceId(char * scopeId, char * registra
     EEPROMInterface eeprom;
     eeprom.read((uint8_t*) buffer, AZ_IOT_HUB_MAX_LEN, 0, AZ_IOT_HUB_ZONE_IDX);
     sasKey = strncmp(buffer + (AZ_IOT_HUB_MAX_LEN - 4), "SSYM", 4) == 0;
-    if (!sasKey && strncmp(buffer + (AZ_IOT_HUB_MAX_LEN - 4), "X509", 4) != 0) return false;
+    if (!sasKey && strncmp(buffer + (AZ_IOT_HUB_MAX_LEN - 4), "X509", 4) != 0) return;
 
     strcpy(scopeId, buffer);
     strcpy(registrationId, buffer + SAS_SCOPE_ID_ENDS);
