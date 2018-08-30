@@ -8,7 +8,7 @@
 
 Watchdog WatchdogController::watchdog;
 
-void WatchdogController::initialize() {
+void WatchdogController::initialize(int timer) {
     if (!watchdog.configure(32767))
     {
         // unlikely. returns false only when the timeout is beyond the supported range

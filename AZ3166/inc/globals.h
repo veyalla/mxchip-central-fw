@@ -84,7 +84,7 @@ struct Globals
 
 // LOGS
 
-#define SERIAL_VERBOSE_LOGGING_ENABLED false
+#define SERIAL_VERBOSE_LOGGING_ENABLED true
 #define IOTHUB_TRACE_LOG_ENABLED       false
 
 // To enable Fan Sound experiment, comment out the line below

@@ -11,6 +11,9 @@
 #include "../inc/webServer.h"
 #include "../inc/config.h"
 #include "../inc/httpHtmlData.h"
+#include "../inc/watchdogController.h"
+
+static WatchdogController resetController;
 
 void OnboardingController::initializeConfigurationSetup() {
     LOG_VERBOSE("OnboardingController::initializeConfigurationSetup");
@@ -89,6 +92,8 @@ void OnboardingController::loop() {
                             Screen.print(2, "Press 'reset'");
                             Screen.print(3, "         now :)");
                             client.write((uint8_t*)HTTP_COMPLETE_RESPONSE, sizeof(HTTP_COMPLETE_RESPONSE) - 1);
+                            resetController.initialize(100);
+                            resetController.reset();
                         } else {
                             LOG_ERROR("User has landed on COMPLETE page without actually completing the setup. Writing the START page to client.");
                             processStartRequest(client);

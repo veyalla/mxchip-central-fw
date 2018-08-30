@@ -30,6 +30,8 @@ void IoTHubClient::initIotHubClient() {
     char registrationId[STRING_BUFFER_128] = {0};
     bool sasKey = false;
     ConfigController::readGroupSXKeyAndDeviceId(scopeId, registrationId, stringBuffer, sasKey);
+    LOG_VERBOSE("SCOPEID: %s REGID: %s KEY: %s IS_SAS: %d", scopeId, registrationId, stringBuffer, sasKey);
+
     DevkitDPSSetLogTrace(SERIAL_VERBOSE_LOGGING_ENABLED);
     if (!DevkitDPSClientStart(sasKey ? DPS_AUTH_SYMMETRIC_KEY : DPS_AUTH_X509_GROUP,
                         "global.azure-devices-provisioning.net",
